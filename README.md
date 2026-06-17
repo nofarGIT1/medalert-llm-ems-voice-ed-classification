@@ -192,9 +192,7 @@ The noisy dataset contains the ASR transcripts and Word Error Rate values.
 
 ### Target Creation
 
-Rule-based methods were used to create the project targets from the source clinical information.
-
-The target labels were not included in the prompts used to generate the EMS reports. Fields used to derive the targets, including triage-related and specialty-related information, were excluded from the report-generation seed when necessary to reduce label leakage.
+The two prediction targets were prepared using different approaches. The ED care-area target was constructed using rule-based criteria based on the source clinical information. The specialty-consultation target was derived from LLM-generated specialty referrals provided in the MIMIC-IV-Ext dataset and mapped into 18 broader consultation categories.
 
 ### Synthetic EMS Report Generation
 
@@ -218,7 +216,6 @@ The audio pipeline included:
 * White background-noise injection
 * Noisy-audio transcription using **Whisper Base**
 * Word Error Rate calculation
-* Checkpoint handling and retrying failed samples
 
 The final experiments focused on the very-high-noise ASR setting, with an average WER of approximately **44%**.
 
@@ -333,7 +330,7 @@ This suggests that the specialty-consultation task may be better represented as 
 
 ## Limitations
 
-* The EMS reports were synthetically generated, and the target labels were created using rule-based methods rather than manual clinician annotation.
+* ED care-area labels were rule-based, while specialty labels came from LLM-generated referrals without full clinician validation.
 * The audio used a synthetic voice, siren, and background noise rather than real ambulance recordings.
 * The pipeline did not represent the full variability of real EMS speakers, accents, devices, and radio channels.
 * Several target classes contained relatively few examples.
