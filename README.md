@@ -118,28 +118,31 @@ The main research question was:
 ```mermaid
 flowchart TB
 
-    subgraph A[Data Generation and Labeling]
-        A1[MIMIC-IV-Ext-CDS source cases]
-        A2[Target construction and specialty mapping]
-        A3[GPT-4.1-mini report generation]
-        A4[Clean synthetic EMS reports]
+    subgraph A["Data Generation and Labeling"]
+        direction TB
+        A1["MIMIC-IV-Ext-CDS<br/>source cases"]
+        A2["Target construction<br/>and specialty mapping"]
+        A3["GPT-4.1-mini<br/>report generation"]
+        A4["Clean synthetic<br/>EMS reports"]
 
         A1 --> A2 --> A3 --> A4
     end
 
-    subgraph B[Audio and ASR Pipeline]
-        B1[Edge-TTS speech generation]
-        B2[Speech acceleration and noise injection]
-        B3[Whisper Base transcription]
-        B4[Noisy ASR transcripts]
+    subgraph B["Audio and ASR Pipeline"]
+        direction TB
+        B1["Edge-TTS<br/>speech generation"]
+        B2["Speech acceleration<br/>and noise injection"]
+        B3["Whisper Base<br/>transcription"]
+        B4["Noisy ASR<br/>transcripts"]
 
         B1 --> B2 --> B3 --> B4
     end
 
-    subgraph C[Model Training and Prediction]
-        C1[Clean + Noisy BioClinicalBERT training]
-        C2[ED Care Area prediction]
-        C3[Specialty Consultation prediction]
+    subgraph C["Model Training and Prediction"]
+        direction TB
+        C1["Clean + Noisy<br/>BioClinicalBERT training"]
+        C2["ED Care Area<br/>prediction"]
+        C3["Specialty Consultation<br/>prediction"]
 
         C1 --> C2
         C1 --> C3
@@ -149,6 +152,7 @@ flowchart TB
     A4 --> C1
     B4 --> C1
 ```
+
 
 ---
 
