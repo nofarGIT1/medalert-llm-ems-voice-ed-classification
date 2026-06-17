@@ -1,85 +1,92 @@
-# MedAlert: LLM-Based EMS Voice Report Classification for ED Decisions
+# MedAlert: ED Decision Classification from LLM-Generated EMS Reports under ASR Noise
 
 **Improving Robustness to ASR Noise with Clean and Noisy Training**
 
 **Authors:** Nofar Refaeli and Meital Gerasi
 
-MedAlert is an end-to-end pipeline for generating synthetic EMS pre-arrival voice reports and predicting emergency department decisions from transcripts affected by ASR noise.
+## Overview
+
+MedAlert is an end-to-end NLP pipeline for generating synthetic Emergency Medical Services (EMS) pre-arrival reports and predicting Emergency Department (ED) preparation decisions from transcripts affected by automatic speech recognition (ASR) noise.
+
+The final system trains BioClinicalBERT on both clean EMS reports and noisy ASR transcripts.
 
 This repository contains the code, project-generated datasets, results, visuals, audio examples, and presentation materials for the MedAlert project.
-
 
 ---
 
 ## Main Result: Clean + Noisy Training
 
-Our full system trains BioClinicalBERT on both clean EMS reports and noisy ASR transcripts and evaluates it on the same noisy ASR test set used across all experiments.
+Our full system trains **BioClinicalBERT on both clean EMS reports and noisy ASR transcripts** and evaluates it on the same noisy ASR test set used across all noisy-evaluation experiments.
 
 This combined strategy achieved the highest noisy-test Macro F1 for both prediction targets:
 
-| Prediction Target      | Full System Macro F1 |
+| Prediction Target      | Full-System Macro F1 |
 | ---------------------- | -------------------: |
 | ED Care Area           |           **29.16%** |
 | Specialty Consultation |           **38.33%** |
 
 ![BioClinicalBERT full system and ablation study](visuals/bioclinicalbert_macro_f1_training_setups.png)
 
-The results indicate that clean and noisy training examples provide complementary information: noisy transcripts improve robustness to transcription errors, while clean reports help preserve the clinical and linguistic signal.
+These results are consistent with clean and noisy reports providing complementary training signals. Clean text may help preserve the original clinical wording, while noisy transcripts expose the model to ASR-related distortions.
 
 ---
 
 ## Ablation Study
 
-To evaluate whether both training components were necessary, we removed one component at a time.
+The ablation study tested whether both clean and noisy training examples were needed.
+
+The full system was:
+
+> **Clean + Noisy → Noisy**
+
+Two ablations were evaluated:
+
+1. Removing noisy training:
+
+   > **Clean → Noisy**
+
+2. Removing clean training:
+
+   > **Noisy → Noisy**
 
 | Target                 | Full System: Clean + Noisy | Without Noisy Training | Without Clean Training |
 | ---------------------- | -------------------------: | ---------------------: | ---------------------: |
 | ED Care Area           |                 **29.16%** |                 22.55% |                 27.64% |
 | Specialty Consultation |                 **38.33%** |                 27.74% |                 31.21% |
 
-Removing noisy training reduced Macro F1 by:
+Removing noisy training reduced Macro F1 by **6.61 percentage points** for ED Care Area and **10.59 points** for Specialty Consultation. Removing clean training reduced it by **1.52** and **7.12 points**, respectively.
 
-* **6.61 percentage points** for ED Care Area
-* **10.59 percentage points** for Specialty Consultation
+The results show that removing either component reduced performance compared with the complete clean-and-noisy system. All ablation and full-system results were evaluated on the same noisy ASR test set.
 
-Removing clean training also reduced performance:
+### Clean-Text Reference Baseline
 
-* **1.52 percentage points** for ED Care Area
-* **7.12 percentage points** for Specialty Consultation
-
-These ablations support the use of both clean and noisy reports in the final system.
-
-> `Clean → Clean` is included in the figure as a reference baseline.
-> All ablation and full-system results were evaluated on the same noisy ASR test set.
+`Clean → Clean` was evaluated using clean text rather than noisy ASR transcripts, so it is a reference baseline rather than a direct ablation comparison. Its Macro F1 was **31.86%** for ED Care Area and **50.60%** for Specialty Consultation.
 
 ---
 
 ## Project Motivation
 
-EMS pre-arrival reports can provide the emergency department with early information about a patient's condition and required preparation.
+EMS pre-arrival reports can help the ED prepare before a patient arrives, including selecting an appropriate care area and anticipating relevant specialty support.
 
-In practice, voice reports may be transcribed automatically under challenging conditions such as:
+However, these reports may be:
 
-* Ambulance and siren noise
-* Fast speech
-* Medical terminology
-* Medication names
-* Vital-sign values
-* Incomplete or disorganized handoffs
+* Short or incomplete
+* Variable in wording
+* Communicated rapidly
+* Affected by ambulance noise and sirens
+* Distorted during automatic transcription
 
-A model trained only on clean text may therefore perform poorly when deployed on real ASR transcripts.
+A classifier trained only on clean text may therefore perform poorly when evaluated on noisy ASR transcripts.
 
 ---
 
 ## Problem Statement
 
-The project investigates whether ED decisions can be predicted from noisy EMS pre-arrival transcripts.
-
-Two classification tasks were defined:
+Given an EMS pre-arrival report, the project predicts two ED decision targets.
 
 ### 1. ED Care Area
 
-Predict the appropriate receiving area:
+Example classes include:
 
 * Triage or waiting room
 * Standard ED bed
@@ -88,11 +95,21 @@ Predict the appropriate receiving area:
 * Trauma bay
 * Resuscitation bay
 
-### 2. Specialty Consultation
-
-Predict the primary medical specialty consultation required for the case.
+### 2. Primary Specialty Consultation
 
 The original specialty values were mapped into **18 broader clinical consultation categories**.
+
+Examples include:
+
+* Cardiology
+* Neurology
+* Orthopedics
+* Gastroenterology
+* General Surgery
+
+The main research question was:
+
+> Can combined training on clean EMS reports and noisy ASR transcripts improve classification robustness under ASR noise?
 
 ---
 
@@ -100,11 +117,11 @@ The original specialty values were mapped into **18 broader clinical consultatio
 
 ```mermaid
 flowchart LR
-    A[MIMIC-IV-Ext-CDS source cases] --> B[Rule-based target creation]
-    B --> C[GPT-4.1-mini generates four EMS report variants]
-    C --> D[Clean synthetic reports]
+    A[MIMIC-IV-Ext-CDS source cases] --> B[Target construction and specialty mapping]
+    B --> C[GPT-4.1-mini report generation]
+    C --> D[Clean synthetic EMS reports]
     D --> E[Edge-TTS speech generation]
-    E --> F[Speech acceleration and ambulance-noise injection]
+    E --> F[Speech acceleration and noise injection]
     F --> G[Whisper Base transcription]
     G --> H[Noisy ASR transcripts]
 
@@ -117,35 +134,47 @@ flowchart LR
 
 ---
 
-## Datasets
+## Dataset
 
 ### Source Dataset
 
-The clinical source cases were obtained from **MIMIC-IV-Ext-CDS**.
+The project was based on:
 
-The original source tables are not included in this repository.
+**MIMIC-IV-Ext Clinical Decision Support for Referral, Triage and Diagnosis — Version 1.0.2**
+
+[View the source dataset on PhysioNet](https://physionet.org/content/mimic-iv-ext-cds/1.0.2/)
+
+The original MIMIC-IV-Ext-CDS source tables are not included in this repository.
 
 ### Project-Generated Dataset
 
-The final project dataset contains:
+The final generated dataset contains:
 
 * **2,139 source cases**
 * **4 EMS report variants per source case**
 * **8,556 synthetic EMS reports**
 
-The clean dataset is available here:
+The clean dataset contains the generated reports after leakage checks and LLM-based post-processing:
 
-[`data/generated_ems_reports_arrival_specialty_consult_v1_cleaned_final.csv`](data/generated_ems_reports_arrival_specialty_consult_v1_cleaned_final.csv)
+[Download the final clean synthetic dataset](data/generated_ems_reports_arrival_specialty_consult_v1_cleaned_final.csv?raw=1)
 
 The full noisy ASR dataset is available as a ZIP file:
 
-[`data/ems_asr_noisy_dataset_8556.zip`](data/ems_asr_noisy_dataset_8556.zip)
+[Download the full noisy ASR dataset](data/ems_asr_noisy_dataset_8556.zip?raw=1)
 
 The noisy dataset contains the ASR transcripts and Word Error Rate values.
 
 ---
 
 ## Data Generation and Augmentation
+
+### Target Creation
+
+Rule-based methods were used to create the project targets from the source clinical information.
+
+The target labels were not included in the prompts used to generate the EMS reports. Fields used to derive the targets, including triage-related and specialty-related information, were excluded from the report-generation seed when necessary to reduce label leakage.
+
+### Synthetic EMS Report Generation
 
 GPT-4.1-mini generated four EMS pre-arrival report variants for each source case:
 
@@ -156,13 +185,20 @@ GPT-4.1-mini generated four EMS pre-arrival report variants for each source case
 
 The generated reports were checked for target leakage and processed using two rounds of LLM-based post-processing.
 
-The audio pipeline then applied:
+### TTS and ASR Pipeline
 
-1. Text-to-speech generation using Edge-TTS
-2. Speech-speed adjustment
-3. Synthetic ambulance-related noise injection
-4. ASR transcription using Whisper Base
-5. Word Error Rate calculation
+The audio pipeline included:
+
+* Text-to-speech generation using **Edge-TTS**
+* Use of a synthetic male voice
+* Speech acceleration to simulate a rapid EMS handoff
+* Synthetic ambulance-like siren generation
+* White background-noise injection
+* Noisy-audio transcription using **Whisper Base**
+* Word Error Rate calculation
+* Checkpoint handling and retrying failed samples
+
+The final experiments focused on the very-high-noise ASR setting, with an average WER of approximately **44%**.
 
 ---
 
@@ -178,23 +214,30 @@ The ASR transcript preserves the main clinical context while introducing errors 
 
 A separate noisy audio sample generated by the audio pipeline is available below:
 
-[▶️ Listen to a noisy EMS voice report](audio/sample_0_noisy.wav)
+[▶️ Listen to or download a noisy EMS voice report](audio/sample_0_noisy.wav?raw=1)
 
 ---
 
 ## Models and Pipelines
 
-The project uses the following models and tools:
+| Pipeline Stage                           | Model or Method                 |
+| ---------------------------------------- | ------------------------------- |
+| Synthetic EMS report generation          | GPT-4.1-mini                    |
+| Text-to-speech                           | Edge-TTS                        |
+| Noise generation                         | Synthetic siren and white noise |
+| Audio transcription                      | Whisper Base                    |
+| General-language classification baseline | DistilBERT                      |
+| Main clinical classification model       | BioClinicalBERT                 |
 
-| Pipeline Stage                  | Model or Method |
-| ------------------------------- | --------------- |
-| Synthetic EMS report generation | GPT-4.1-mini    |
-| Text-to-speech                  | Edge-TTS        |
-| Audio transcription             | Whisper Base    |
-| Text classification baselines   | DistilBERT      |
-| Main classification model       | BioClinicalBERT |
+### BioClinicalBERT
 
-BioClinicalBERT was selected as the main model because it generally achieved stronger Macro F1 performance, particularly for specialty consultation.
+BioClinicalBERT is a clinical-domain Transformer pretrained on biomedical and clinical text. It was selected as the main model because it generally achieved stronger Macro F1 performance, particularly for specialty consultation.
+
+### DistilBERT
+
+DistilBERT is a smaller, general-purpose Transformer model used as a comparison baseline to evaluate whether a non-clinical model behaved differently under ASR noise.
+
+[View the complete BioClinicalBERT and DistilBERT results](results/final_model_results.csv)
 
 ---
 
@@ -223,7 +266,7 @@ For combined training, each training report was represented twice:
 * Once using its clean text
 * Once using its noisy ASR transcript
 
-Validation and test evaluation used noisy ASR transcripts only.
+For the combined setup, validation and test evaluation used noisy ASR transcripts only.
 
 ---
 
@@ -237,11 +280,7 @@ Validation and test evaluation used noisy ASR transcripts only.
 
 ### ASR Metric
 
-* **Word Error Rate (WER)** — measures the difference between the original clean report and the ASR transcript
-
-The full comparison table is available here:
-
-[`results/final_model_results.csv`](results/final_model_results.csv)
+* **Word Error Rate (WER)** — measures the difference between the original clean report and its ASR transcript
 
 ---
 
@@ -260,15 +299,38 @@ Rare labels such as trauma bay and triage or waiting room showed lower recall.
 
 ### Specialty Consultation
 
-Several errors occurred between clinically related specialties, including:
-
-* General Surgery and Gastroenterology
-* Neurosurgery and Neurology
-* Neurology and Orthopedics
+Several errors occurred between clinically related specialties, particularly between General Surgery and Gastroenterology, Neurosurgery and Neurology, and neurological or neurosurgical cases predicted as Orthopedic Consultation.
 
 ![Most common specialty-consultation confusions](visuals/specialty_common_confusions.png)
 
-The multi-label analysis also showed that some predictions counted as incorrect primary labels were valid secondary specialty annotations.
+Among predictions counted as incorrect against the primary specialty label, **11.48% were valid secondary specialty labels** according to the multi-label annotation.
+
+This suggests that the specialty-consultation task may be better represented as a multi-label classification problem in future work.
+
+---
+
+## Limitations
+
+* The EMS reports were synthetically generated, and the target labels were created using rule-based methods rather than manual clinician annotation.
+* The audio used a synthetic voice, siren, and background noise rather than real ambulance recordings.
+* The pipeline did not represent the full variability of real EMS speakers, accents, devices, and radio channels.
+* Several target classes contained relatively few examples.
+* Specialty consultation was evaluated as a single-label task even though some cases had multiple relevant specialties.
+* Performance under severe ASR noise remained below the clean-text reference baseline.
+* This project is a research proof of concept and has not been clinically validated for real-time decision support.
+
+---
+
+## Future Work
+
+Future improvements may include:
+
+* Modeling specialty consultation as a multi-label or top-k prediction task
+* Testing different clean-to-noisy training ratios
+* Adding more examples for rare ED care-area classes
+* Evaluating real ambulance audio with more voices, accents, speaking rates, and noise conditions
+* Evaluating medical-domain ASR models
+* Validating the targets and predictions with clinical experts
 
 ---
 
@@ -316,7 +378,7 @@ Includes:
 * Source-data preparation and rule-based target creation
 * Synthetic EMS report generation using GPT-4.1-mini
 * Leakage checks and LLM-based text post-processing
-* Predefined train, validation, and test splits by source_case_id
+* Predefined train, validation, and test splits by `source_case_id`
 * Transformer training, model comparison, and error analysis
 
 ### TTS and ASR Pipeline Notebook
@@ -336,9 +398,9 @@ Includes:
 ## Presentations
 
 * [Final Presentation — PDF](slides/MedAlert_Final_Presentation.pdf)
-* [Final Presentation — PowerPoint](slides/MedAlert_Final_Presentation.pptx)
+* [Download Final Presentation — PowerPoint](slides/MedAlert_Final_Presentation.pptx?raw=1)
 * [Interim Presentation — PDF](slides/MedAlert_Interim_Presentation.pdf)
-* [Interim Presentation — PowerPoint](slides/MedAlert_Interim_Presentation.pptx)
+* [Download Interim Presentation — PowerPoint](slides/MedAlert_Interim_Presentation.pptx?raw=1)
 
 ---
 
@@ -351,13 +413,8 @@ Some stages require:
 * Google Drive access
 * A GPU runtime for Transformer training
 * An OpenAI API key for synthetic report generation and post-processing
+* Internet access for downloading pretrained models and running the TTS and ASR stages
 
 Large trained-model checkpoints and the complete collection of generated audio files are not included in the repository.
 
----
-
-## Team Members
-
-* Nofar Refaeli
-* Meital Gerasi
-
+Developed as part of the B.Sc. program in Digital Technologies in Medicine at the Holon Institute of Technology (HIT).
