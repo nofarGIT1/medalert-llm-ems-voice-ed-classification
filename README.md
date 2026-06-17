@@ -176,11 +176,11 @@ The final generated dataset contains:
 * **4 EMS report variants per source case**
 * **8,556 synthetic EMS reports**
 
-### Clean Dataset
+The clean dataset contains the generated reports after leakage checks and LLM-based post-processing:
 
 [View or download the final clean synthetic dataset](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/data/generated_ems_reports_arrival_specialty_consult_v1_cleaned_final.csv)
 
-### Noisy ASR Dataset
+The noisy dataset contains the ASR transcripts and Word Error Rate values:
 
 [Download the full noisy ASR dataset](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/data/ems_asr_noisy_dataset_8556.zip)
 
@@ -389,7 +389,9 @@ medalert-ems-voice-classification/
 
 ### Main Data and Modeling Notebook
 
-[`notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb`](notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
+[View Notebook 01 in nbviewer](https://nbviewer.org/github/nofarGIT1/medalert-llm-ems-voice-ed-classification/blob/main/notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
+
+[Download `01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb`](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
 
 Includes:
 
