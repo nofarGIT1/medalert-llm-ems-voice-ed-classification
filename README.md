@@ -116,20 +116,38 @@ The main research question was:
 ## Visual Abstract
 
 ```mermaid
-flowchart LR
-    A[MIMIC-IV-Ext-CDS source cases] --> B[Target construction and specialty mapping]
-    B --> C[GPT-4.1-mini report generation]
-    C --> D[Clean synthetic EMS reports]
-    D --> E[Edge-TTS speech generation]
-    E --> F[Speech acceleration and noise injection]
-    F --> G[Whisper Base transcription]
-    G --> H[Noisy ASR transcripts]
+flowchart TB
 
-    D --> I[Clean + Noisy BioClinicalBERT training]
-    H --> I
+    subgraph A[Data Generation and Labeling]
+        A1[MIMIC-IV-Ext-CDS source cases]
+        A2[Target construction and specialty mapping]
+        A3[GPT-4.1-mini report generation]
+        A4[Clean synthetic EMS reports]
 
-    I --> J[ED Care Area prediction]
-    I --> K[Specialty Consultation prediction]
+        A1 --> A2 --> A3 --> A4
+    end
+
+    subgraph B[Audio and ASR Pipeline]
+        B1[Edge-TTS speech generation]
+        B2[Speech acceleration and noise injection]
+        B3[Whisper Base transcription]
+        B4[Noisy ASR transcripts]
+
+        B1 --> B2 --> B3 --> B4
+    end
+
+    subgraph C[Model Training and Prediction]
+        C1[Clean + Noisy BioClinicalBERT training]
+        C2[ED Care Area prediction]
+        C3[Specialty Consultation prediction]
+
+        C1 --> C2
+        C1 --> C3
+    end
+
+    A4 --> B1
+    A4 --> C1
+    B4 --> C1
 ```
 
 ---
