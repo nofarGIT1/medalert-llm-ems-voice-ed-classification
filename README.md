@@ -389,7 +389,7 @@ medalert-ems-voice-classification/
 
 ### Main Data and Modeling Notebook
 
-[View Notebook 01 in nbviewer](https://nbviewer.org/github/nofarGIT1/medalert-llm-ems-voice-ed-classification/blob/main/notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
+[Open `01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb` in Google Colab](https://colab.research.google.com/github/nofarGIT1/medalert-llm-ems-voice-ed-classification/blob/main/notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
 
 [Download `01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb`](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/notebooks/01_MedAlert_Data_Generation_Labeling_and_Modeling.ipynb)
 
