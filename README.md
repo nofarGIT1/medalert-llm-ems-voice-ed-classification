@@ -1,4 +1,4 @@
-# MedAlert: MedAlert: ED Decision Classification from LLM-Generated EMS Voice Reports
+# MedAlert: ED Decision Classification from LLM-Generated EMS Voice Reports
 
 **Improving Robustness to ASR Noise with Clean and Noisy Training**
 
