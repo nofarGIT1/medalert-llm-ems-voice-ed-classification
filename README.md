@@ -415,12 +415,12 @@ Includes:
 
 ---
 
-## Presentations
+* ## Presentations
 
-* [Final Presentation — PDF](slides/MedAlert_Final_Presentation.pdf)
-* [Download Final Presentation — PowerPoint](slides/MedAlert_Final_Presentation.pptx?raw=1)
-* [Interim Presentation — PDF](slides/MedAlert_Interim_Presentation.pdf)
-* [Download Interim Presentation — PowerPoint](slides/MedAlert_Interim_Presentation.pptx?raw=1)
+- [Final Presentation — PDF](slides/MedAlert_Final_Presentation.pdf)
+- [Download Final Presentation — PowerPoint](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/slides/MedAlert_Final_Presentation.pptx)
+- [Interim Presentation — PDF](slides/MedAlert_Interim_Presentation.pdf)
+- [Download Interim Presentation — PowerPoint](https://raw.githubusercontent.com/nofarGIT1/medalert-llm-ems-voice-ed-classification/main/slides/MedAlert_Interim_Presentation.pptx)
 
 ---
 
